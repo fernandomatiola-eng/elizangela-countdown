@@ -63,6 +63,45 @@
             }
         }
 
+        .audio-controls {
+            position: fixed;
+            top: 20px;
+            right: 20px;
+            z-index: 100;
+            background: rgba(255, 255, 255, 0.2);
+            padding: 15px 20px;
+            border-radius: 50px;
+            backdrop-filter: blur(10px);
+            border: 2px solid rgba(255, 255, 255, 0.3);
+            display: flex;
+            align-items: center;
+            gap: 10px;
+            box-shadow: 0 4px 15px rgba(0, 0, 0, 0.2);
+        }
+
+        .audio-button {
+            background: none;
+            border: none;
+            font-size: 1.5em;
+            cursor: pointer;
+            color: white;
+            transition: all 0.3s ease;
+            padding: 5px 10px;
+            border-radius: 50%;
+        }
+
+        .audio-button:hover {
+            transform: scale(1.2);
+            background: rgba(255, 255, 255, 0.2);
+        }
+
+        .volume-slider {
+            width: 100px;
+            height: 5px;
+            cursor: pointer;
+            accent-color: #ff1493;
+        }
+
         .container {
             text-align: center;
             background: rgba(255, 255, 255, 0.15);
@@ -381,15 +420,36 @@
             .hearts-header {
                 font-size: 2em;
             }
+
+            .audio-controls {
+                top: 10px;
+                right: 10px;
+                padding: 10px 15px;
+            }
+
+            .volume-slider {
+                width: 80px;
+            }
         }
     </style>
 </head>
 <body>
+    <!-- CONTROLES DE ÁUDIO -->
+    <div class="audio-controls">
+        <button class="audio-button" id="audioToggle" title="Ativar/Desativar som">🔊</button>
+        <input type="range" class="volume-slider" id="volumeSlider" min="0" max="100" value="30" title="Ajustar volume">
+    </div>
+
+    <!-- ÁUDIO DE FUNDO -->
+    <audio id="backgroundMusic" loop>
+        <source src="https://www.soundhelix.com/examples/mp3/SoundHelix-Song-1.mp3" type="audio/mpeg">
+    </audio>
+
     <div class="floating-hearts" id="floatingHearts"></div>
 
     <div class="container">
         <div class="header">
-            <div class="hearts-header"❤️ 💕 ❤️</div>
+            <div class="hearts-header">❤️ 💕 ❤️</div>
             <h1>Elizângela</h1>
             <p class="subtitle">Você está chegando</p>
             <p class="date-info">26 de janeiro de 2026 • 8h25</p>
@@ -484,6 +544,35 @@
     </div>
 
     <script>
+        // CONTROLE DE ÁUDIO
+        const audio = document.getElementById('backgroundMusic');
+        const audioToggle = document.getElementById('audioToggle');
+        const volumeSlider = document.getElementById('volumeSlider');
+
+        // Iniciar áudio com volume baixo
+        audio.volume = 0.3;
+
+        // Toggle de áudio
+        audioToggle.addEventListener('click', () => {
+            if (audio.paused) {
+                audio.play();
+                audioToggle.textContent = '🔊';
+            } else {
+                audio.pause();
+                audioToggle.textContent = '🔇';
+            }
+        });
+
+        // Controle de volume
+        volumeSlider.addEventListener('input', (e) => {
+            audio.volume = e.target.value / 100;
+        });
+
+        // Tentar reproduzir automaticamente (alguns navegadores bloqueiam)
+        audio.play().catch(() => {
+            console.log('Reprodução automática bloqueada. Clique no botão de som para ativar.');
+        });
+
         // FRASES DE OLAVO DE CARVALHO
         const olavoFrases = [
             "O amor não é um sentimento; é uma decisão, um ato de vontade e um comprometimento existencial profundo.",
@@ -541,7 +630,7 @@
             "Amor é consistência, é escolher a mesma pessoa todos os dias."
         ];
 
-        // FRASES DE ELIZÂNGELA (Extraídas dos chats - Elogios e contemplação)
+        // FRASES DE ELIZÂNGELA
         const elizangelaFrases = [
             "Que querido! É raro um homem falar assim nos dias de hoje.",
             "Você também tem excelente gosto musical!",
@@ -560,7 +649,7 @@
             "Você é um presente de Deus na minha vida."
         ];
 
-        // FRASES DE FERNANDO (Extraídas dos chats - Elogios e contemplação)
+        // FRASES DE FERNANDO
         const fernandoFrases = [
             "Adorei conhecê-la. Suas qualidades, tanta autenticidade, determinação e coragem me deixaram ainda mais interessado.",
             "É raro encontrar pessoas, especialmente mais jovens, com um perfil tão admirável.",
@@ -579,7 +668,7 @@
             "Seu coração é tão puro e genuíno."
         ];
 
-        // FRASES COMBINADAS (Olavo + Jordan + Amor)
+        // FRASES COMBINADAS
         const combinedFrases = [
             "O amor é uma decisão renovada a cada dia, com coragem e vulnerabilidade.",
             "A saudade é o preço do amor verdadeiro, que exige compromisso e responsabilidade.",
@@ -627,7 +716,7 @@
             }, 1000);
         }
 
-        // Inicializar frases de Olavo (muda a cada 10 segundos)
+        // Inicializar frases de Olavo
         function initOlavo() {
             displayQuote('olavoQuote', 'olavoAuthor', 'olavoTimer', olavoFrases, 'Próxima em 10s');
             document.getElementById('olavoAuthor').textContent = '— Olavo de Carvalho';
@@ -639,7 +728,7 @@
             }, 10000);
         }
 
-        // Inicializar frases de Jordan (muda a cada 10 segundos)
+        // Inicializar frases de Jordan
         function initJordan() {
             displayQuote('jordanQuote', 'jordanAuthor', 'jordanTimer', jordanFrases, 'Próxima em 10s');
             document.getElementById('jordanAuthor').textContent = '— Jordan Peterson';
@@ -651,7 +740,7 @@
             }, 10000);
         }
 
-        // Inicializar frases de Linguagens (muda a cada 10 segundos)
+        // Inicializar frases de Linguagens
         function initLanguages() {
             displayQuote('languagesQuote', 'languagesAuthor', 'languagesTimer', languagesFrases, 'Próxima em 10s');
             document.getElementById('languagesAuthor').textContent = '— As 5 Linguagens do Amor';
@@ -663,7 +752,7 @@
             }, 10000);
         }
 
-        // Inicializar frases de Elizângela (muda a cada 20 segundos)
+        // Inicializar frases de Elizângela
         function initElizangela() {
             displayQuote('elizangelaQuote', 'elizangelaAuthor', 'elizangelaTimer', elizangelaFrases, 'Próxima em 20s');
             document.getElementById('elizangelaAuthor').textContent = '— Elizângela';
@@ -675,7 +764,7 @@
             }, 20000);
         }
 
-        // Inicializar frases de Fernando (muda a cada 20 segundos)
+        // Inicializar frases de Fernando
         function initFernando() {
             displayQuote('fernandoQuote', 'fernandoAuthor', 'fernandoTimer', fernandoFrases, 'Próxima em 20s');
             document.getElementById('fernandoAuthor').textContent = '— Fernando Serafim Matiola';
@@ -687,7 +776,7 @@
             }, 20000);
         }
 
-        // Inicializar frases combinadas (muda a cada 10 segundos)
+        // Inicializar frases combinadas
         function initCombined() {
             displayQuote('combinedQuote', 'combinedAuthor', 'combinedTimer', combinedFrases, 'Próxima em 10s');
             document.getElementById('combinedAuthor').textContent = '— Olavo & Jordan & Amor';
