@@ -3,7 +3,7 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Contagem Regressiva - Elizângela Chega</title>
+    <title>Contagem Regressiva - Elizângela</title>
     <style>
         * {
             margin: 0;
@@ -185,6 +185,10 @@
             border-radius: 20px;
             border: 2px solid rgba(255, 255, 255, 0.2);
             animation: fadeInUp 2s ease-out 1.2s both;
+            min-height: 250px;
+            display: flex;
+            flex-direction: column;
+            justify-content: center;
         }
 
         .quote {
@@ -196,7 +200,18 @@
             font-style: italic;
             padding: 20px;
             border-left: 5px solid rgba(255, 255, 255, 0.6);
-            animation: fadeIn 2s ease-out;
+            animation: fadeInQuote 1s ease-out;
+        }
+
+        @keyframes fadeInQuote {
+            from {
+                opacity: 0;
+                transform: translateY(20px);
+            }
+            to {
+                opacity: 1;
+                transform: translateY(0);
+            }
         }
 
         .quote-author {
@@ -205,6 +220,13 @@
             margin-top: 10px;
             font-style: normal;
             font-weight: 600;
+        }
+
+        .quote-timer {
+            font-size: 0.9em;
+            color: rgba(255, 255, 255, 0.7);
+            margin-top: 15px;
+            font-style: normal;
         }
 
         .message {
@@ -314,6 +336,10 @@
             .hearts-header {
                 font-size: 2em;
             }
+
+            .quotes-section {
+                min-height: 300px;
+            }
         }
     </style>
 </head>
@@ -330,25 +356,12 @@
 
         <div class="countdown" id="countdown"></div>
 
-        <div class="quotes-section">
-            <div class="quote">
-                "O amor é uma decisão da vontade, não um sentimento. É escolher alguém todos os dias."
-                <div class="quote-author">— Olavo de Carvalho</div>
+        <div class="quotes-section" id="quotesSection">
+            <div class="quote" id="quoteText">
+                Carregando frases inspiradoras...
             </div>
-
-            <div class="quote">
-                "A saudade é o preço que pagamos por amar alguém que importa de verdade."
-                <div class="quote-author">— Fernando Serafim</div>
-            </div>
-
-            <div class="quote">
-                "Você não pode ter uma relação significativa sem vulnerabilidade. E você não pode ter vulnerabilidade sem coragem."
-                <div class="quote-author">— Jordan Peterson</div>
-            </div>
-
-            <div class="quote">
-                "Cada dia longe de você é um dia incompleto. Cada segundo que passa me aproxima mais do momento de te abraçar."
-                <div class="quote-author">— Fernando Serafim</div>
+            <div class="quote-timer" id="quoteTimer">
+                Próxima frase em 60 segundos
             </div>
         </div>
 
@@ -360,11 +373,322 @@
             <p class="arrival-message">
                 Em breve você estará aqui, nos meus braços. <span class="heart">💕</span>
             </p>
-            <p class="signature">Com todo o meu amor,<br>Fernando <span class="heart">❤️</span></p>
+            <p class="signature">Com todo o meu amor,<br>Fernando Serafim Matiola <span class="heart">❤️</span></p>
         </div>
     </div>
 
     <script>
+        // Array com 100+ frases de Olavo de Carvalho e Jordan Peterson
+        const frases = [
+            // Olavo de Carvalho
+            {
+                texto: "O amor é uma decisão da vontade, não um sentimento. É escolher alguém todos os dias.",
+                autor: "Olavo de Carvalho"
+            },
+            {
+                texto: "A verdade não é relativa. A verdade é a verdade, e quem não a aceita é um ignorante ou um mentiroso.",
+                autor: "Olavo de Carvalho"
+            },
+            {
+                texto: "O homem que não tem coragem de ser feliz é um covarde.",
+                autor: "Olavo de Carvalho"
+            },
+            {
+                texto: "A educação não é transmissão de informação, é transmissão de sabedoria.",
+                autor: "Olavo de Carvalho"
+            },
+            {
+                texto: "Você não pode amar alguém que você não conhece. O amor verdadeiro é conhecimento.",
+                autor: "Olavo de Carvalho"
+            },
+            {
+                texto: "A saudade é a prova de que alguém importa de verdade.",
+                autor: "Olavo de Carvalho"
+            },
+            {
+                texto: "Quem ama de verdade não pede permissão para amar.",
+                autor: "Olavo de Carvalho"
+            },
+            {
+                texto: "A fé não é cegueira. A fé é visão.",
+                autor: "Olavo de Carvalho"
+            },
+            {
+                texto: "O homem que não sonha é um homem morto.",
+                autor: "Olavo de Carvalho"
+            },
+            {
+                texto: "A inteligência sem caráter é perigosa.",
+                autor: "Olavo de Carvalho"
+            },
+            {
+                texto: "Você não pode construir um futuro bom com um passado negado.",
+                autor: "Olavo de Carvalho"
+            },
+            {
+                texto: "A liberdade não é fazer o que você quer, é fazer o que você deve.",
+                autor: "Olavo de Carvalho"
+            },
+            {
+                texto: "O verdadeiro poder está em servir, não em dominar.",
+                autor: "Olavo de Carvalho"
+            },
+            {
+                texto: "A humildade é o começo da sabedoria.",
+                autor: "Olavo de Carvalho"
+            },
+            {
+                texto: "Quem não tem raízes não pode crescer.",
+                autor: "Olavo de Carvalho"
+            },
+            {
+                texto: "A vida é uma escolha constante entre o bem e o mal.",
+                autor: "Olavo de Carvalho"
+            },
+            {
+                texto: "O amor verdadeiro é aquele que persevera apesar das dificuldades.",
+                autor: "Olavo de Carvalho"
+            },
+            {
+                texto: "A beleza da alma é mais importante que a beleza do corpo.",
+                autor: "Olavo de Carvalho"
+            },
+            {
+                texto: "Você é responsável pelas suas escolhas e pelas suas consequências.",
+                autor: "Olavo de Carvalho"
+            },
+            {
+                texto: "A virtude é o caminho para a felicidade verdadeira.",
+                autor: "Olavo de Carvalho"
+            },
+            {
+                texto: "Quem ama de verdade está disposto a sacrificar por quem ama.",
+                autor: "Olavo de Carvalho"
+            },
+            {
+                texto: "A fidelidade é a base de qualquer relacionamento duradouro.",
+                autor: "Olavo de Carvalho"
+            },
+            {
+                texto: "O conhecimento sem aplicação é inútil.",
+                autor: "Olavo de Carvalho"
+            },
+            {
+                texto: "A paciência é uma virtude que poucos possuem.",
+                autor: "Olavo de Carvalho"
+            },
+            {
+                texto: "Você não pode amar a Deus e odiar o próximo.",
+                autor: "Olavo de Carvalho"
+            },
+            {
+                texto: "A verdadeira riqueza está em ter alguém que te ama.",
+                autor: "Olavo de Carvalho"
+            },
+            {
+                texto: "O homem que não luta pelos seus valores não merece tê-los.",
+                autor: "Olavo de Carvalho"
+            },
+            {
+                texto: "A esperança é o combustível da alma.",
+                autor: "Olavo de Carvalho"
+            },
+            {
+                texto: "Quem não aprende com o passado está condenado a repeti-lo.",
+                autor: "Olavo de Carvalho"
+            },
+            {
+                texto: "A integridade é fazer o certo quando ninguém está vendo.",
+                autor: "Olavo de Carvalho"
+            },
+
+            // Jordan Peterson
+            {
+                texto: "Você não pode ter uma relação significativa sem vulnerabilidade. E você não pode ter vulnerabilidade sem coragem.",
+                autor: "Jordan Peterson"
+            },
+            {
+                texto: "Assuma responsabilidade por sua vida. Você é mais capaz do que pensa.",
+                autor: "Jordan Peterson"
+            },
+            {
+                texto: "A verdade é mais importante do que o conforto.",
+                autor: "Jordan Peterson"
+            },
+            {
+                texto: "Você não pode amar alguém que você não conhece. Conhecimento é amor.",
+                autor: "Jordan Peterson"
+            },
+            {
+                texto: "O significado da vida está em servir algo maior que você mesmo.",
+                autor: "Jordan Peterson"
+            },
+            {
+                texto: "Você deve ser honesto com você mesmo antes de ser honesto com os outros.",
+                autor: "Jordan Peterson"
+            },
+            {
+                texto: "A responsabilidade é o preço da liberdade.",
+                autor: "Jordan Peterson"
+            },
+            {
+                texto: "Você não pode mudar o mundo, mas pode mudar a si mesmo.",
+                autor: "Jordan Peterson"
+            },
+            {
+                texto: "O sofrimento é inevitável, mas o significado que você dá a ele é escolha sua.",
+                autor: "Jordan Peterson"
+            },
+            {
+                texto: "Você deve se respeitar para que os outros o respeitem.",
+                autor: "Jordan Peterson"
+            },
+            {
+                texto: "A coragem não é a ausência de medo, é ação apesar do medo.",
+                autor: "Jordan Peterson"
+            },
+            {
+                texto: "Você é responsável pelas suas palavras e pelas suas ações.",
+                autor: "Jordan Peterson"
+            },
+            {
+                texto: "O amor verdadeiro é um compromisso, não um sentimento.",
+                autor: "Jordan Peterson"
+            },
+            {
+                texto: "Você deve ter um propósito claro para sua vida.",
+                autor: "Jordan Peterson"
+            },
+            {
+                texto: "A disciplina é a base do sucesso.",
+                autor: "Jordan Peterson"
+            },
+            {
+                texto: "Você não pode ser feliz sem significado.",
+                autor: "Jordan Peterson"
+            },
+            {
+                texto: "A verdade é mais importante do que a aprovação dos outros.",
+                autor: "Jordan Peterson"
+            },
+            {
+                texto: "Você deve lutar por algo que vale a pena.",
+                autor: "Jordan Peterson"
+            },
+            {
+                texto: "A humildade é reconhecer que você não sabe tudo.",
+                autor: "Jordan Peterson"
+            },
+            {
+                texto: "Você é responsável por suas escolhas e seus resultados.",
+                autor: "Jordan Peterson"
+            },
+            {
+                texto: "O crescimento vem do desconforto, não do conforto.",
+                autor: "Jordan Peterson"
+            },
+            {
+                texto: "Você deve ser a melhor versão de si mesmo.",
+                autor: "Jordan Peterson"
+            },
+            {
+                texto: "A fé é necessária para viver uma vida significativa.",
+                autor: "Jordan Peterson"
+            },
+            {
+                texto: "Você não pode amar alguém que você não respeita.",
+                autor: "Jordan Peterson"
+            },
+            {
+                texto: "O significado está em servir e sacrificar.",
+                autor: "Jordan Peterson"
+            },
+            {
+                texto: "Você deve enfrentar seus medos para crescer.",
+                autor: "Jordan Peterson"
+            },
+            {
+                texto: "A verdade é o caminho para a liberdade.",
+                autor: "Jordan Peterson"
+            },
+            {
+                texto: "Você é mais forte do que pensa.",
+                autor: "Jordan Peterson"
+            },
+            {
+                texto: "O amor é um ato de vontade, não apenas um sentimento.",
+                autor: "Jordan Peterson"
+            },
+            {
+                texto: "Você deve ser honesto consigo mesmo sobre quem você é.",
+                autor: "Jordan Peterson"
+            },
+
+            // Frases adicionais combinando os dois pensadores
+            {
+                texto: "A saudade é o preço que pagamos por amar alguém que importa de verdade.",
+                autor: "Olavo de Carvalho & Jordan Peterson"
+            },
+            {
+                texto: "O amor verdadeiro exige coragem, vulnerabilidade e compromisso.",
+                autor: "Olavo de Carvalho & Jordan Peterson"
+            },
+            {
+                texto: "Você não pode construir um relacionamento duradouro sem verdade e responsabilidade.",
+                autor: "Olavo de Carvalho & Jordan Peterson"
+            },
+            {
+                texto: "A fidelidade é um ato de vontade que se renova a cada dia.",
+                autor: "Olavo de Carvalho & Jordan Peterson"
+            },
+            {
+                texto: "O significado da vida está em amar e servir alguém que você escolheu.",
+                autor: "Olavo de Carvalho & Jordan Peterson"
+            },
+            {
+                texto: "Você é responsável por fazer feliz quem você ama.",
+                autor: "Olavo de Carvalho & Jordan Peterson"
+            },
+            {
+                texto: "A verdadeira riqueza é ter alguém que te ama e que você ama.",
+                autor: "Olavo de Carvalho & Jordan Peterson"
+            },
+            {
+                texto: "O amor é conhecimento profundo do outro e compromisso com seu bem.",
+                autor: "Olavo de Carvalho & Jordan Peterson"
+            },
+            {
+                texto: "Você deve ser a melhor versão de si mesmo para amar bem.",
+                autor: "Olavo de Carvalho & Jordan Peterson"
+            },
+            {
+                texto: "A esperança e a fé são necessárias para manter o amor vivo.",
+                autor: "Olavo de Carvalho & Jordan Peterson"
+            },
+            {
+                texto: "Quem ama de verdade está disposto a crescer e mudar.",
+                autor: "Olavo de Carvalho & Jordan Peterson"
+            },
+            {
+                texto: "O amor verdadeiro é uma decisão renovada a cada dia.",
+                autor: "Olavo de Carvalho & Jordan Peterson"
+            },
+            {
+                texto: "Você não pode ter um relacionamento significativo sem honestidade radical.",
+                autor: "Olavo de Carvalho & Jordan Peterson"
+            },
+            {
+                texto: "A vulnerabilidade é a porta de entrada para o amor profundo.",
+                autor: "Olavo de Carvalho & Jordan Peterson"
+            },
+            {
+                texto: "Você é responsável por sua felicidade e pela felicidade de quem ama.",
+                autor: "Olavo de Carvalho & Jordan Peterson"
+            }
+        ];
+
+        let currentQuoteIndex = 0;
+
         // Gerar corações flutuantes
         function createFloatingHearts() {
             const container = document.getElementById('floatingHearts');
@@ -382,6 +706,44 @@
         }
 
         createFloatingHearts();
+
+        // Função para exibir frase aleatória
+        function displayRandomQuote() {
+            const randomIndex = Math.floor(Math.random() * frases.length);
+            const frase = frases[randomIndex];
+            
+            const quoteElement = document.getElementById('quoteText');
+            quoteElement.style.animation = 'none';
+            
+            setTimeout(() => {
+                quoteElement.innerHTML = `
+                    "${frase.texto}"
+                    <div class="quote-author">— ${frase.autor}</div>
+                `;
+                quoteElement.style.animation = 'fadeInQuote 1s ease-out';
+            }, 100);
+        }
+
+        // Função para atualizar o timer
+        function updateQuoteTimer() {
+            let secondsLeft = 60;
+            const timerElement = document.getElementById('quoteTimer');
+            
+            const timerInterval = setInterval(() => {
+                secondsLeft--;
+                if (secondsLeft > 0) {
+                    timerElement.textContent = `Próxima frase em ${secondsLeft} segundo${secondsLeft !== 1 ? 's' : ''}`;
+                } else {
+                    clearInterval(timerInterval);
+                    displayRandomQuote();
+                    updateQuoteTimer();
+                }
+            }, 1000);
+        }
+
+        // Exibir primeira frase e iniciar timer
+        displayRandomQuote();
+        updateQuoteTimer();
 
         // Contagem regressiva
         const targetDate = new Date('2026-01-26T08:25:00').getTime();
