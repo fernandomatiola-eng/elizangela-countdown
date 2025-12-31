@@ -63,57 +63,48 @@
             }
         }
 
-        .audio-controls {
+        .spotify-player-container {
             position: fixed;
             top: 20px;
             right: 20px;
             z-index: 100;
-            background: rgba(255, 255, 255, 0.2);
-            padding: 15px 20px;
-            border-radius: 50px;
+            background: rgba(0, 0, 0, 0.3);
+            padding: 15px;
+            border-radius: 15px;
             backdrop-filter: blur(10px);
-            border: 2px solid rgba(255, 255, 255, 0.3);
+            border: 2px solid rgba(255, 255, 255, 0.2);
             display: flex;
+            flex-direction: column;
+            gap: 10px;
+        }
+
+        .spotify-controls {
+            display: flex;
+            gap: 10px;
+            justify-content: center;
             align-items: center;
-            gap: 15px;
-            box-shadow: 0 4px 15px rgba(0, 0, 0, 0.2);
-            flex-wrap: wrap;
-            max-width: 350px;
         }
 
-        .audio-button {
-            background: none;
+        .music-button {
+            background: rgba(29, 185, 84, 0.8);
             border: none;
-            font-size: 1.5em;
-            cursor: pointer;
             color: white;
-            transition: all 0.3s ease;
-            padding: 5px 10px;
-            border-radius: 50%;
-        }
-
-        .audio-button:hover {
-            transform: scale(1.2);
-            background: rgba(255, 255, 255, 0.2);
-        }
-
-        .volume-slider {
-            width: 100px;
-            height: 5px;
+            padding: 10px 15px;
+            border-radius: 50px;
             cursor: pointer;
-            accent-color: #ff1493;
-        }
-
-        .current-music {
-            font-size: 0.85em;
-            color: rgba(255, 255, 255, 0.9);
-            text-align: center;
-            min-width: 300px;
-        }
-
-        .music-title {
+            font-size: 0.9em;
             font-weight: 600;
-            color: white;
+            transition: all 0.3s ease;
+            box-shadow: 0 4px 15px rgba(0, 0, 0, 0.2);
+        }
+
+        .music-button:hover {
+            background: rgba(29, 185, 84, 1);
+            transform: scale(1.05);
+        }
+
+        .music-button:active {
+            transform: scale(0.95);
         }
 
         .container {
@@ -435,39 +426,28 @@
                 font-size: 2em;
             }
 
-            .audio-controls {
+            .spotify-player-container {
                 top: 10px;
                 right: 10px;
-                padding: 10px 15px;
-                max-width: 100%;
+                padding: 10px;
             }
 
-            .volume-slider {
-                width: 80px;
-            }
-
-            .current-music {
-                min-width: auto;
-                font-size: 0.75em;
+            .music-button {
+                padding: 8px 12px;
+                font-size: 0.8em;
             }
         }
     </style>
 </head>
 <body>
-    <!-- CONTROLES DE ÁUDIO -->
-    <div class="audio-controls">
-        <button class="audio-button" id="audioToggle" title="Ativar/Desativar som">🎵</button>
-        <input type="range" class="volume-slider" id="volumeSlider" min="0" max="100" value="30" title="Ajustar volume">
-        <div class="current-music">
-            <div style="font-size: 0.75em; color: rgba(255,255,255,0.7);">Tocando agora:</div>
-            <div class="music-title" id="currentMusicTitle">Sertanejo Romântico</div>
+    <!-- SPOTIFY PLAYER COM BOTÃO DE TROCA -->
+    <div class="spotify-player-container">
+        <div class="spotify-controls">
+            <button class="music-button" onclick="toggleSpotifyPlayer()" title="Abrir/Fechar Player">🎵 Playlist</button>
+            <button class="music-button" onclick="changeMusic()" title="Próxima Música">⏭️ Próxima</button>
         </div>
+        <div id="spotifyPlayerDiv"></div>
     </div>
-
-    <!-- ÁUDIO DE FUNDO -->
-    <audio id="backgroundMusic" crossorigin="anonymous">
-        <source src="" type="audio/mpeg">
-    </audio>
 
     <div class="floating-hearts" id="floatingHearts"></div>
 
@@ -568,145 +548,33 @@
     </div>
 
     <script>
-        // PLAYLIST DE MÚSICAS SERTANEJAS ROMÂNTICAS
-        // Usando URLs de músicas disponíveis publicamente no YouTube Music
-        const playlistSertaneja = [
-            {
-                titulo: "Evidências - Chitãozinho & Xororó",
-                url: "https://www.youtube.com/embed/dQw4w9WgXcQ"
-            },
-            {
-                titulo: "Aquele Abraço - Gilberto Gil",
-                url: "https://www.youtube.com/embed/dQw4w9WgXcQ"
-            },
-            {
-                titulo: "Sonho Meu - Chitãozinho & Xororó",
-                url: "https://www.youtube.com/embed/dQw4w9WgXcQ"
-            },
-            {
-                titulo: "Saudade - Luan Santana",
-                url: "https://www.youtube.com/embed/dQw4w9WgXcQ"
-            },
-            {
-                titulo: "Tudo Por Você - Luan Santana",
-                url: "https://www.youtube.com/embed/dQw4w9WgXcQ"
-            },
-            {
-                titulo: "Você É Tudo - Dilsinho",
-                url: "https://www.youtube.com/embed/dQw4w9WgXcQ"
-            },
-            {
-                titulo: "Você Mudou Minha Vida - Luan Santana",
-                url: "https://www.youtube.com/embed/dQw4w9WgXcQ"
-            },
-            {
-                titulo: "Meu Coração Bate Por Você - Gusttavo Lima",
-                url: "https://www.youtube.com/embed/dQw4w9WgXcQ"
-            },
-            {
-                titulo: "Você É Meu Bem - Gusttavo Lima",
-                url: "https://www.youtube.com/embed/dQw4w9WgXcQ"
-            },
-            {
-                titulo: "Tudo Que Você Merecia - Maiara & Maraisa",
-                url: "https://www.youtube.com/embed/dQw4w9WgXcQ"
-            },
-            {
-                titulo: "Pra Você Sorrir - Marília Mendonça",
-                url: "https://www.youtube.com/embed/dQw4w9WgXcQ"
-            },
-            {
-                titulo: "Entrega Total - Aviões do Forró",
-                url: "https://www.youtube.com/embed/dQw4w9WgXcQ"
-            },
-            {
-                titulo: "Sem Você - Anitta ft. Maluma",
-                url: "https://www.youtube.com/embed/dQw4w9WgXcQ"
-            },
-            {
-                titulo: "Você É Meu Lugar - Henrique & Juliano",
-                url: "https://www.youtube.com/embed/dQw4w9WgXcQ"
-            },
-            {
-                titulo: "Você Não Sai da Minha Cabeça - Henrique & Juliano",
-                url: "https://www.youtube.com/embed/dQw4w9WgXcQ"
-            },
-            {
-                titulo: "Você É Meu Mundo - Sorriso Maroto",
-                url: "https://www.youtube.com/embed/dQw4w9WgXcQ"
-            },
-            {
-                titulo: "Tudo Por Amor - Sorriso Maroto",
-                url: "https://www.youtube.com/embed/dQw4w9WgXcQ"
-            },
-            {
-                titulo: "Você Me Completa - Zé Neto & Cristiano",
-                url: "https://www.youtube.com/embed/dQw4w9WgXcQ"
-            },
-            {
-                titulo: "Você É Tudo - Zé Felipe",
-                url: "https://www.youtube.com/embed/dQw4w9WgXcQ"
-            },
-            {
-                titulo: "Você Completa Mim - Zé Felipe",
-                url: "https://www.youtube.com/embed/dQw4w9WgXcQ"
+        // CONTROLE DO SPOTIFY PLAYER
+        let spotifyPlayerVisible = false;
+
+        function toggleSpotifyPlayer() {
+            spotifyPlayerVisible = !spotifyPlayerVisible;
+            const playerDiv = document.getElementById('spotifyPlayerDiv');
+            
+            if (spotifyPlayerVisible) {
+                playerDiv.innerHTML = `
+                    <iframe style="border-radius: 12px; margin-top: 10px;" 
+                            src="https://open.spotify.com/embed/playlist/2lr0gwq211NQcipKZrflY9?utm_source=generator" 
+                            width="280" 
+                            height="360" 
+                            frameBorder="0" 
+                            allowfullscreen="" 
+                            allow="autoplay; clipboard-write; encrypted-media; fullscreen; picture-in-picture" 
+                            loading="lazy">
+                    </iframe>
+                `;
+            } else {
+                playerDiv.innerHTML = '';
             }
-        ];
-
-        // CONTROLE DE ÁUDIO
-        const audio = document.getElementById('backgroundMusic');
-        const audioToggle = document.getElementById('audioToggle');
-        const volumeSlider = document.getElementById('volumeSlider');
-        const currentMusicTitle = document.getElementById('currentMusicTitle');
-
-        // Iniciar áudio com volume baixo
-        audio.volume = 0.3;
-
-        // Função para tocar próxima música
-        function playNextMusic() {
-            const randomIndex = Math.floor(Math.random() * playlistSertaneja.length);
-            const musica = playlistSertaneja[randomIndex];
-            
-            // Atualizar título
-            currentMusicTitle.textContent = musica.titulo;
-            
-            // Nota: Para usar URLs reais de áudio, você precisaria de um servidor
-            // Aqui estamos usando um placeholder
-            console.log('Tocando agora: ' + musica.titulo);
         }
 
-        // Toggle de áudio
-        audioToggle.addEventListener('click', () => {
-            if (audio.paused) {
-                audio.play().catch(err => {
-                    console.log('Não foi possível reproduzir áudio. Use uma URL válida de áudio.');
-                    playNextMusic();
-                });
-                audioToggle.textContent = '🎵';
-            } else {
-                audio.pause();
-                audioToggle.textContent = '🔇';
-            }
-        });
-
-        // Controle de volume
-        volumeSlider.addEventListener('input', (e) => {
-            audio.volume = e.target.value / 100;
-        });
-
-        // Quando a música termina, toca a próxima
-        audio.addEventListener('ended', () => {
-            playNextMusic();
-            audio.play().catch(err => console.log('Erro ao reproduzir'));
-        });
-
-        // Inicializar primeira música
-        playNextMusic();
-
-        // Tentar reproduzir automaticamente
-        audio.play().catch(() => {
-            console.log('Reprodução automática bloqueada. Clique no botão de som para ativar.');
-        });
+        function changeMusic() {
+            alert('🎵 Clique no player do Spotify para escolher a próxima música!\n\nOu use os controles dentro do player para navegar pela playlist.');
+        }
 
         // FRASES DE OLAVO DE CARVALHO
         const olavoFrases = [
@@ -765,7 +633,7 @@
             "Amor é consistência, é escolher a mesma pessoa todos os dias."
         ];
 
-        // FRASES DE ELIZÂNGELA
+        // FRASES DE ELIZÂNGELA (Extraídas dos chats - Elogios e contemplação)
         const elizangelaFrases = [
             "Que querido! É raro um homem falar assim nos dias de hoje.",
             "Você também tem excelente gosto musical!",
@@ -781,10 +649,15 @@
             "Seu coração é tão puro e sincero.",
             "Você me faz acreditar no amor verdadeiro.",
             "Sua fé em Deus me inspira profundamente.",
-            "Você é um presente de Deus na minha vida."
+            "Você é um presente de Deus na minha vida.",
+            "Obrigada por todos os gestos de carinho e as palavras que eu amooo ler e ouvir!",
+            "Você exala masculinidade, Fernando. Não há nada melhor para uma mulher!",
+            "Que lindoooo!",
+            "Que massa!",
+            "Que lindo!"
         ];
 
-        // FRASES DE FERNANDO
+        // FRASES DE FERNANDO (Extraídas dos chats - Elogios e contemplação)
         const fernandoFrases = [
             "Adorei conhecê-la. Suas qualidades, tanta autenticidade, determinação e coragem me deixaram ainda mais interessado.",
             "É raro encontrar pessoas, especialmente mais jovens, com um perfil tão admirável.",
@@ -800,7 +673,12 @@
             "Sua inteligência me desafia e me inspira.",
             "Sua maturidade é extraordinária para sua idade.",
             "Você é a resposta das minhas orações.",
-            "Seu coração é tão puro e genuíno."
+            "Seu coração é tão puro e genuíno.",
+            "Você merece cada um dos gestos que faço, e sempre buscarei me aprimorar, pois você é uma pessoa extraordinária.",
+            "É incrível como encontramos tantos interesses em comum e como admiro as características que você possui.",
+            "Você é a mulher que mais me inspira e que representa tudo o que eu busco em uma futura esposa.",
+            "Você pode ficar toda descabelada, mas para mim, continua sendo a mulher mais linda do mundo!",
+            "Sua beleza é tão especial que só quem conhece seu coração consegue enxergá-la de verdade."
         ];
 
         // FRASES COMBINADAS
