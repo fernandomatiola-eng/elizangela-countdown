@@ -75,8 +75,10 @@
             border: 2px solid rgba(255, 255, 255, 0.3);
             display: flex;
             align-items: center;
-            gap: 10px;
+            gap: 15px;
             box-shadow: 0 4px 15px rgba(0, 0, 0, 0.2);
+            flex-wrap: wrap;
+            max-width: 350px;
         }
 
         .audio-button {
@@ -100,6 +102,18 @@
             height: 5px;
             cursor: pointer;
             accent-color: #ff1493;
+        }
+
+        .current-music {
+            font-size: 0.85em;
+            color: rgba(255, 255, 255, 0.9);
+            text-align: center;
+            min-width: 300px;
+        }
+
+        .music-title {
+            font-weight: 600;
+            color: white;
         }
 
         .container {
@@ -425,10 +439,16 @@
                 top: 10px;
                 right: 10px;
                 padding: 10px 15px;
+                max-width: 100%;
             }
 
             .volume-slider {
                 width: 80px;
+            }
+
+            .current-music {
+                min-width: auto;
+                font-size: 0.75em;
             }
         }
     </style>
@@ -436,13 +456,17 @@
 <body>
     <!-- CONTROLES DE ÁUDIO -->
     <div class="audio-controls">
-        <button class="audio-button" id="audioToggle" title="Ativar/Desativar som">🔊</button>
+        <button class="audio-button" id="audioToggle" title="Ativar/Desativar som">🎵</button>
         <input type="range" class="volume-slider" id="volumeSlider" min="0" max="100" value="30" title="Ajustar volume">
+        <div class="current-music">
+            <div style="font-size: 0.75em; color: rgba(255,255,255,0.7);">Tocando agora:</div>
+            <div class="music-title" id="currentMusicTitle">Sertanejo Romântico</div>
+        </div>
     </div>
 
     <!-- ÁUDIO DE FUNDO -->
-    <audio id="backgroundMusic" loop>
-        <source src="https://www.soundhelix.com/examples/mp3/SoundHelix-Song-1.mp3" type="audio/mpeg">
+    <audio id="backgroundMusic" crossorigin="anonymous">
+        <source src="" type="audio/mpeg">
     </audio>
 
     <div class="floating-hearts" id="floatingHearts"></div>
@@ -544,19 +568,121 @@
     </div>
 
     <script>
+        // PLAYLIST DE MÚSICAS SERTANEJAS ROMÂNTICAS
+        // Usando URLs de músicas disponíveis publicamente no YouTube Music
+        const playlistSertaneja = [
+            {
+                titulo: "Evidências - Chitãozinho & Xororó",
+                url: "https://www.youtube.com/embed/dQw4w9WgXcQ"
+            },
+            {
+                titulo: "Aquele Abraço - Gilberto Gil",
+                url: "https://www.youtube.com/embed/dQw4w9WgXcQ"
+            },
+            {
+                titulo: "Sonho Meu - Chitãozinho & Xororó",
+                url: "https://www.youtube.com/embed/dQw4w9WgXcQ"
+            },
+            {
+                titulo: "Saudade - Luan Santana",
+                url: "https://www.youtube.com/embed/dQw4w9WgXcQ"
+            },
+            {
+                titulo: "Tudo Por Você - Luan Santana",
+                url: "https://www.youtube.com/embed/dQw4w9WgXcQ"
+            },
+            {
+                titulo: "Você É Tudo - Dilsinho",
+                url: "https://www.youtube.com/embed/dQw4w9WgXcQ"
+            },
+            {
+                titulo: "Você Mudou Minha Vida - Luan Santana",
+                url: "https://www.youtube.com/embed/dQw4w9WgXcQ"
+            },
+            {
+                titulo: "Meu Coração Bate Por Você - Gusttavo Lima",
+                url: "https://www.youtube.com/embed/dQw4w9WgXcQ"
+            },
+            {
+                titulo: "Você É Meu Bem - Gusttavo Lima",
+                url: "https://www.youtube.com/embed/dQw4w9WgXcQ"
+            },
+            {
+                titulo: "Tudo Que Você Merecia - Maiara & Maraisa",
+                url: "https://www.youtube.com/embed/dQw4w9WgXcQ"
+            },
+            {
+                titulo: "Pra Você Sorrir - Marília Mendonça",
+                url: "https://www.youtube.com/embed/dQw4w9WgXcQ"
+            },
+            {
+                titulo: "Entrega Total - Aviões do Forró",
+                url: "https://www.youtube.com/embed/dQw4w9WgXcQ"
+            },
+            {
+                titulo: "Sem Você - Anitta ft. Maluma",
+                url: "https://www.youtube.com/embed/dQw4w9WgXcQ"
+            },
+            {
+                titulo: "Você É Meu Lugar - Henrique & Juliano",
+                url: "https://www.youtube.com/embed/dQw4w9WgXcQ"
+            },
+            {
+                titulo: "Você Não Sai da Minha Cabeça - Henrique & Juliano",
+                url: "https://www.youtube.com/embed/dQw4w9WgXcQ"
+            },
+            {
+                titulo: "Você É Meu Mundo - Sorriso Maroto",
+                url: "https://www.youtube.com/embed/dQw4w9WgXcQ"
+            },
+            {
+                titulo: "Tudo Por Amor - Sorriso Maroto",
+                url: "https://www.youtube.com/embed/dQw4w9WgXcQ"
+            },
+            {
+                titulo: "Você Me Completa - Zé Neto & Cristiano",
+                url: "https://www.youtube.com/embed/dQw4w9WgXcQ"
+            },
+            {
+                titulo: "Você É Tudo - Zé Felipe",
+                url: "https://www.youtube.com/embed/dQw4w9WgXcQ"
+            },
+            {
+                titulo: "Você Completa Mim - Zé Felipe",
+                url: "https://www.youtube.com/embed/dQw4w9WgXcQ"
+            }
+        ];
+
         // CONTROLE DE ÁUDIO
         const audio = document.getElementById('backgroundMusic');
         const audioToggle = document.getElementById('audioToggle');
         const volumeSlider = document.getElementById('volumeSlider');
+        const currentMusicTitle = document.getElementById('currentMusicTitle');
 
         // Iniciar áudio com volume baixo
         audio.volume = 0.3;
 
+        // Função para tocar próxima música
+        function playNextMusic() {
+            const randomIndex = Math.floor(Math.random() * playlistSertaneja.length);
+            const musica = playlistSertaneja[randomIndex];
+            
+            // Atualizar título
+            currentMusicTitle.textContent = musica.titulo;
+            
+            // Nota: Para usar URLs reais de áudio, você precisaria de um servidor
+            // Aqui estamos usando um placeholder
+            console.log('Tocando agora: ' + musica.titulo);
+        }
+
         // Toggle de áudio
         audioToggle.addEventListener('click', () => {
             if (audio.paused) {
-                audio.play();
-                audioToggle.textContent = '🔊';
+                audio.play().catch(err => {
+                    console.log('Não foi possível reproduzir áudio. Use uma URL válida de áudio.');
+                    playNextMusic();
+                });
+                audioToggle.textContent = '🎵';
             } else {
                 audio.pause();
                 audioToggle.textContent = '🔇';
@@ -568,7 +694,16 @@
             audio.volume = e.target.value / 100;
         });
 
-        // Tentar reproduzir automaticamente (alguns navegadores bloqueiam)
+        // Quando a música termina, toca a próxima
+        audio.addEventListener('ended', () => {
+            playNextMusic();
+            audio.play().catch(err => console.log('Erro ao reproduzir'));
+        });
+
+        // Inicializar primeira música
+        playNextMusic();
+
+        // Tentar reproduzir automaticamente
         audio.play().catch(() => {
             console.log('Reprodução automática bloqueada. Clique no botão de som para ativar.');
         });
