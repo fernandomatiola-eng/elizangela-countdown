@@ -1,0 +1,436 @@
+<!DOCTYPE html>
+<html lang="pt-BR">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Contagem Regressiva - Elizângela Chega</title>
+    <style>
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+        }
+
+        body {
+            font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+            background: linear-gradient(135deg, #ff1493 0%, #ff69b4 25%, #dda0dd 50%, #ff69b4 75%, #ff1493 100%);
+            min-height: 100vh;
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            padding: 20px;
+            animation: gradientShift 15s ease infinite;
+            background-size: 400% 400%;
+        }
+
+        @keyframes gradientShift {
+            0% { background-position: 0% 50%; }
+            50% { background-position: 100% 50%; }
+            100% { background-position: 0% 50%; }
+        }
+
+        .floating-hearts {
+            position: fixed;
+            width: 100%;
+            height: 100%;
+            top: 0;
+            left: 0;
+            pointer-events: none;
+            overflow: hidden;
+        }
+
+        .heart-float {
+            position: absolute;
+            font-size: 2em;
+            opacity: 0.6;
+            animation: float 6s infinite ease-in;
+        }
+
+        @keyframes float {
+            0% {
+                transform: translateY(100vh) translateX(0);
+                opacity: 0;
+            }
+            10% {
+                opacity: 0.8;
+            }
+            90% {
+                opacity: 0.8;
+            }
+            100% {
+                transform: translateY(-100vh) translateX(100px);
+                opacity: 0;
+            }
+        }
+
+        .container {
+            text-align: center;
+            background: rgba(255, 255, 255, 0.15);
+            padding: 60px 40px;
+            border-radius: 25px;
+            backdrop-filter: blur(15px);
+            box-shadow: 0 8px 32px 0 rgba(31, 38, 135, 0.37);
+            border: 2px solid rgba(255, 255, 255, 0.25);
+            max-width: 1000px;
+            animation: slideUp 1s ease-out;
+            position: relative;
+            z-index: 10;
+        }
+
+        @keyframes slideUp {
+            from {
+                opacity: 0;
+                transform: translateY(50px);
+            }
+            to {
+                opacity: 1;
+                transform: translateY(0);
+            }
+        }
+
+        .header {
+            margin-bottom: 40px;
+        }
+
+        .hearts-header {
+            font-size: 3em;
+            margin-bottom: 15px;
+            animation: heartBeat 1.5s ease-in-out infinite;
+        }
+
+        h1 {
+            font-size: 4em;
+            color: white;
+            margin-bottom: 10px;
+            text-shadow: 4px 4px 8px rgba(0, 0, 0, 0.5);
+            animation: fadeInDown 1.5s ease-out;
+            letter-spacing: 2px;
+        }
+
+        .subtitle {
+            font-size: 1.8em;
+            color: rgba(255, 255, 255, 0.95);
+            margin-bottom: 20px;
+            text-shadow: 3px 3px 6px rgba(0, 0, 0, 0.4);
+            animation: fadeInDown 1.5s ease-out 0.3s both;
+        }
+
+        .date-info {
+            font-size: 1.3em;
+            color: rgba(255, 255, 255, 0.9);
+            margin-bottom: 30px;
+            text-shadow: 2px 2px 4px rgba(0, 0, 0, 0.3);
+            animation: fadeInDown 1.5s ease-out 0.6s both;
+        }
+
+        .countdown {
+            display: flex;
+            justify-content: center;
+            flex-wrap: wrap;
+            gap: 25px;
+            margin: 50px 0;
+            animation: fadeIn 2s ease-out 0.9s both;
+        }
+
+        .time-unit {
+            background: rgba(255, 255, 255, 0.2);
+            padding: 40px 30px;
+            border-radius: 20px;
+            min-width: 140px;
+            box-shadow: 0 4px 15px rgba(0, 0, 0, 0.3);
+            border: 2px solid rgba(255, 255, 255, 0.4);
+            transition: all 0.3s ease;
+            animation: scaleIn 0.8s ease-out;
+        }
+
+        .time-unit:hover {
+            background: rgba(255, 255, 255, 0.3);
+            transform: translateY(-8px);
+            box-shadow: 0 12px 30px rgba(0, 0, 0, 0.4);
+            border-color: rgba(255, 255, 255, 0.6);
+        }
+
+        @keyframes scaleIn {
+            from {
+                opacity: 0;
+                transform: scale(0.5);
+            }
+            to {
+                opacity: 1;
+                transform: scale(1);
+            }
+        }
+
+        .time-unit h2 {
+            font-size: 3.5em;
+            color: white;
+            margin: 0 0 12px 0;
+            text-shadow: 3px 3px 6px rgba(0, 0, 0, 0.4);
+            font-weight: 700;
+        }
+
+        .time-unit p {
+            font-size: 1.3em;
+            color: rgba(255, 255, 255, 0.95);
+            margin: 0;
+            text-transform: uppercase;
+            letter-spacing: 2px;
+            font-weight: 600;
+        }
+
+        .quotes-section {
+            margin-top: 60px;
+            padding: 40px;
+            background: rgba(255, 255, 255, 0.1);
+            border-radius: 20px;
+            border: 2px solid rgba(255, 255, 255, 0.2);
+            animation: fadeInUp 2s ease-out 1.2s both;
+        }
+
+        .quote {
+            font-size: 1.4em;
+            color: white;
+            line-height: 1.8;
+            margin: 25px 0;
+            text-shadow: 2px 2px 4px rgba(0, 0, 0, 0.3);
+            font-style: italic;
+            padding: 20px;
+            border-left: 5px solid rgba(255, 255, 255, 0.6);
+            animation: fadeIn 2s ease-out;
+        }
+
+        .quote-author {
+            font-size: 1.1em;
+            color: rgba(255, 255, 255, 0.85);
+            margin-top: 10px;
+            font-style: normal;
+            font-weight: 600;
+        }
+
+        .message {
+            margin-top: 50px;
+            font-size: 1.4em;
+            color: white;
+            line-height: 2;
+            text-shadow: 2px 2px 4px rgba(0, 0, 0, 0.3);
+            animation: fadeInUp 2s ease-out 1.5s both;
+        }
+
+        .message p {
+            margin: 15px 0;
+        }
+
+        .heart {
+            display: inline-block;
+            color: #ff1493;
+            font-size: 1.6em;
+            animation: heartBeat 1.5s ease-in-out infinite;
+            margin: 0 5px;
+        }
+
+        .signature {
+            font-size: 1.5em;
+            font-weight: 700;
+            margin-top: 20px;
+            color: white;
+            text-shadow: 2px 2px 4px rgba(0, 0, 0, 0.3);
+        }
+
+        .arrival-message {
+            margin-top: 40px;
+            font-size: 1.3em;
+            color: rgba(255, 255, 255, 0.9);
+            text-shadow: 2px 2px 4px rgba(0, 0, 0, 0.3);
+            animation: fadeInUp 2s ease-out 1.8s both;
+        }
+
+        @keyframes heartBeat {
+            0%, 100% { transform: scale(1); }
+            25% { transform: scale(1.3); }
+            50% { transform: scale(1); }
+        }
+
+        @keyframes fadeInDown {
+            from {
+                opacity: 0;
+                transform: translateY(-30px);
+            }
+            to {
+                opacity: 1;
+                transform: translateY(0);
+            }
+        }
+
+        @keyframes fadeInUp {
+            from {
+                opacity: 0;
+                transform: translateY(30px);
+            }
+            to {
+                opacity: 1;
+                transform: translateY(0);
+            }
+        }
+
+        @keyframes fadeIn {
+            from { opacity: 0; }
+            to { opacity: 1; }
+        }
+
+        @media (max-width: 768px) {
+            h1 {
+                font-size: 2.8em;
+            }
+
+            .subtitle {
+                font-size: 1.4em;
+            }
+
+            .time-unit {
+                min-width: 110px;
+                padding: 25px 15px;
+            }
+
+            .time-unit h2 {
+                font-size: 2.5em;
+            }
+
+            .time-unit p {
+                font-size: 1em;
+            }
+
+            .quote {
+                font-size: 1.1em;
+            }
+
+            .message {
+                font-size: 1.1em;
+            }
+
+            .container {
+                padding: 40px 20px;
+            }
+
+            .hearts-header {
+                font-size: 2em;
+            }
+        }
+    </style>
+</head>
+<body>
+    <div class="floating-hearts" id="floatingHearts"></div>
+
+    <div class="container">
+        <div class="header">
+            <div class="hearts-header">❤️ 💕 ❤️</div>
+            <h1>Elizângela</h1>
+            <p class="subtitle">Você está chegando</p>
+            <p class="date-info">26 de janeiro de 2026 • 8h25</p>
+        </div>
+
+        <div class="countdown" id="countdown"></div>
+
+        <div class="quotes-section">
+            <div class="quote">
+                "O amor é uma decisão da vontade, não um sentimento. É escolher alguém todos os dias."
+                <div class="quote-author">— Olavo de Carvalho</div>
+            </div>
+
+            <div class="quote">
+                "A saudade é o preço que pagamos por amar alguém que importa de verdade."
+                <div class="quote-author">— Fernando Serafim</div>
+            </div>
+
+            <div class="quote">
+                "Você não pode ter uma relação significativa sem vulnerabilidade. E você não pode ter vulnerabilidade sem coragem."
+                <div class="quote-author">— Jordan Peterson</div>
+            </div>
+
+            <div class="quote">
+                "Cada dia longe de você é um dia incompleto. Cada segundo que passa me aproxima mais do momento de te abraçar."
+                <div class="quote-author">— Fernando Serafim</div>
+            </div>
+        </div>
+
+        <div class="message">
+            <p><span class="heart">❤️</span> Minha querida Elizângela <span class="heart">❤️</span></p>
+            <p>Cada segundo que passa me aproxima mais de você.</p>
+            <p>A saudade é intensa, mas a esperança é maior.</p>
+            <p>Você é minha resposta, minha bênção, meu tudo.</p>
+            <p class="arrival-message">
+                Em breve você estará aqui, nos meus braços. <span class="heart">💕</span>
+            </p>
+            <p class="signature">Com todo o meu amor,<br>Fernando <span class="heart">❤️</span></p>
+        </div>
+    </div>
+
+    <script>
+        // Gerar corações flutuantes
+        function createFloatingHearts() {
+            const container = document.getElementById('floatingHearts');
+            const hearts = ['❤️', '💕', '💖', '💗', '💝'];
+
+            for (let i = 0; i < 20; i++) {
+                const heart = document.createElement('div');
+                heart.className = 'heart-float';
+                heart.textContent = hearts[Math.floor(Math.random() * hearts.length)];
+                heart.style.left = Math.random() * 100 + '%';
+                heart.style.animationDelay = Math.random() * 6 + 's';
+                heart.style.animationDuration = (5 + Math.random() * 3) + 's';
+                container.appendChild(heart);
+            }
+        }
+
+        createFloatingHearts();
+
+        // Contagem regressiva
+        const targetDate = new Date('2026-01-26T08:25:00').getTime();
+
+        function updateCountdown() {
+            const now = new Date().getTime();
+            const distance = targetDate - now;
+
+            if (distance < 0) {
+                document.getElementById('countdown').innerHTML = `
+                    <div style="width: 100%; text-align: center;">
+                        <h2 style="font-size: 3em; color: white; text-shadow: 3px 3px 6px rgba(0,0,0,0.4); animation: heartBeat 1.5s ease-in-out infinite;">
+                            ❤️ ELA CHEGOU! ❤️
+                        </h2>
+                        <p style="font-size: 1.5em; color: rgba(255,255,255,0.9); margin-top: 20px; text-shadow: 2px 2px 4px rgba(0,0,0,0.3);">
+                            Bem-vinda ao meu coração, Elizângela! 💕
+                        </p>
+                    </div>
+                `;
+                return;
+            }
+
+            const days = Math.floor(distance / (1000 * 60 * 60 * 24));
+            const hours = Math.floor((distance % (1000 * 60 * 60 * 24)) / (1000 * 60 * 60));
+            const minutes = Math.floor((distance % (1000 * 60 * 60)) / (1000 * 60));
+            const seconds = Math.floor((distance % (1000 * 60)) / 1000);
+
+            document.getElementById('countdown').innerHTML = `
+                <div class="time-unit">
+                    <h2>${String(days).padStart(2, '0')}</h2>
+                    <p>Dias</p>
+                </div>
+                <div class="time-unit">
+                    <h2>${String(hours).padStart(2, '0')}</h2>
+                    <p>Horas</p>
+                </div>
+                <div class="time-unit">
+                    <h2>${String(minutes).padStart(2, '0')}</h2>
+                    <p>Minutos</p>
+                </div>
+                <div class="time-unit">
+                    <h2>${String(seconds).padStart(2, '0')}</h2>
+                    <p>Segundos</p>
+                </div>
+            `;
+        }
+
+        updateCountdown();
+        setInterval(updateCountdown, 1000);
+    </script>
+</body>
+</html>
